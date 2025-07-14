@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Offline WebCacheX Pro</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WebCacheX Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
 </head>
 <body>
-  <header>
-    <h1>WebCacheX Pro</h1>
-    <input id="urlInput" type="text" placeholder="Enter website URL" />
-    <button id="addUrlBtn">Cache It</button>
-  </header>
-  <main>
-    <p id="status">Ready</p>
-    <ul id="pagesList"></ul>
-  </main>
-  <script src="db.js"></script>
+  <h1>WebCacheX Pro</h1>
+  <p>Offline smart web caching and browsing app (PWA)</p>
+
+  <input type="text" id="urlInput" placeholder="Enter a URL (text or video)" />
+  <button onclick="cacheURL()">Cache Page</button>
+  <button onclick="viewCachedPages()">View Cached</button>
+
+  <div id="output"></div>
+
   <script src="app.js"></script>
 </body>
 </html>
