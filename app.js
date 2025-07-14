@@ -1,66 +1,34 @@
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
-    .then(() => console.log('SW registered'))
-    .catch(console.error);
-}
+async function cacheURL() {
+  const url = document.getElementById("urlInput").value;
+  const output = document.getElementById("output");
+  output.innerText = "Caching...";
 
-const statusEl = document.getElementById('status');
-const urlInput = document.getElementById('urlInput');
-const addUrlBtn = document.getElementById('addUrlBtn');
-const pagesList = document.getElementById('pagesList');
-
-function setStatus(msg) {
-  statusEl.textContent = msg;
-}
-
-async function fetchAndStore(url) {
-  setStatus(`Fetching ${url}...`);
   try {
-    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
-    if (!res.ok) throw new Error('Fetch failed');
-    const html = await res.text();
-    await savePage({ url, html, timestamp: Date.now() });
-    setStatus(`Cached ${url}`);
-    renderList();
+    const response = await fetch(url);
+    const content = await response.text();
+    localStorage.setItem(url, content);
+    output.innerText = "Cached successfully!";
   } catch (err) {
-    setStatus(`Error: ${err.message}`);
+    output.innerText = "Error: Failed to fetch";
+    console.error(err);
   }
 }
 
-function renderList() {
-  getAllPages().then(pages => {
-    pagesList.innerHTML = '';
-    pages.forEach(p => {
-      const li = document.createElement('li');
-      const date = new Date(p.timestamp).toLocaleString();
-      li.innerHTML = `
-        <a href="#" data-url="${p.url}">${p.url}</a>
-        <span> (cached: ${date})</span>
-        <button data-del="${p.url}">🗑️</button>`;
-      pagesList.appendChild(li);
-    });
-  });
+function viewCachedPages() {
+  const output = document.getElementById("output");
+  output.innerHTML = "<h3>Cached Pages:</h3>";
+
+  if (localStorage.length === 0) {
+    output.innerHTML += "No pages cached.";
+    return;
+  }
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    output.innerHTML += <p><strong>${key}</strong><br/><textarea rows="8" cols="80">${localStorage.getItem(key)}</textarea></p>;
+  }
 }
 
-pagesList.addEventListener('click', e => {
-  if (e.target.dataset.url) {
-    e.preventDefault();
-    getAllPages().then(pages => {
-      const page = pages.find(p => p.url === e.target.dataset.url);
-      if (page) {
-        const w = window.open();
-        w.document.write(page.html);
-      }
-    });
-  }
-  if (e.target.dataset.del) {
-    deletePage(e.target.dataset.del).then(renderList);
-  }
-});
-
-addUrlBtn.addEventListener('click', () => {
-  const url = urlInput.value.trim();
-  if (url) fetchAndStore(url);
-});
-
-window.addEventListener('load', renderList);
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
