@@ -1,43 +1,62 @@
-// Detect dark mode toggle
+// 🌙 Theme toggle
 document.getElementById("toggleTheme").addEventListener("click", () => {
   document.body.classList.toggle("dark-mode");
   localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
 });
 
-// Apply saved theme on load
+// Load saved theme
 window.addEventListener("DOMContentLoaded", () => {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") {
+  if (localStorage.getItem("theme") === "dark") {
     document.body.classList.add("dark-mode");
   }
 });
 
-// Handle URL caching
+// 🔄 Fetch and cache logic
 async function cacheURL() {
   const url = document.getElementById("urlInput").value.trim();
   const output = document.getElementById("output");
   output.innerText = "Fetching and caching...";
 
   try {
-    const response = await fetch(url);
-    const contentType = response.headers.get("Content-Type");
-    const blob = await response.blob();
+    const result = await fetchPageContent(url);
 
-    if (contentType.includes("text/html")) {
-      const text = await blob.text();
-      await savePage(url, text);
+    if (typeof result === "string") {
+      await savePage(url, result);
     } else {
-      await savePage(url, { blob, type: contentType });
+      await savePage(url, { blob: result, type: result.type });
     }
 
     output.innerText = "✅ Cached successfully!";
   } catch (err) {
-    output.innerText = "❌ Error fetching the page.";
+    output.innerText = ❌ Error: ${err.message};
     console.error(err);
   }
 }
 
-// Display all cached content
+// 🌐 Intelligent fetch based on type
+async function fetchPageContent(url) {
+  // Handle Wikipedia with CORS proxy
+  if (url.includes("wikipedia.org/wiki")) {
+    const proxy = https://api.allorigins.win/raw?url=${encodeURIComponent(url)};
+    const res = await fetch(proxy);
+    if (!res.ok) throw new Error("Wikipedia fetch failed");
+    return await res.text();
+  }
+
+  // Normal fetch
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Fetch failed");
+
+  const type = res.headers.get("Content-Type") || "";
+
+  if (type.includes("text/html")) {
+    return await res.text();
+  } else {
+    return await res.blob(); // for files like PDF, image, video
+  }
+}
+
+// 📦 Display all cached content
 async function viewCachedPages() {
   const output = document.getElementById("output");
   const pages = await getAllPages();
@@ -49,69 +68,70 @@ async function viewCachedPages() {
   }
 
   for (const p of pages) {
-    const container = document.createElement("div");
-    container.style.marginBottom = "20px";
+    const box = document.createElement("div");
+    box.style.marginBottom = "20px";
 
     const title = document.createElement("strong");
     title.innerText = p.url;
-    container.appendChild(title);
-
-    container.appendChild(document.createElement("br"));
+    box.appendChild(title);
+    box.appendChild(document.createElement("br"));
 
     if (typeof p.content === "string") {
-      // Text/HTML content
       const ta = document.createElement("textarea");
       ta.rows = 10;
       ta.value = p.content;
-      container.appendChild(ta);
+      box.appendChild(ta);
     } else if (p.content.blob && p.content.type) {
-      const fileURL = URL.createObjectURL(new Blob([p.content.blob]));
+      const blob = new Blob([p.content.blob], { type: p.content.type });
+      const fileURL = URL.createObjectURL(blob);
+
       if (p.content.type.includes("pdf")) {
-        const pdfLink = document.createElement("a");
-        pdfLink.href = fileURL;
-        pdfLink.innerText = "Open PDF";
-        pdfLink.target = "_blank";
-        container.appendChild(pdfLink);
+        const link = document.createElement("a");
+        link.href = fileURL;
+        link.textContent = "📄 Open PDF";
+        link.target = "_blank";
+        box.appendChild(link);
       } else if (p.content.type.includes("image")) {
         const img = document.createElement("img");
         img.src = fileURL;
         img.style.maxWidth = "100%";
-        container.appendChild(img);
+        box.appendChild(img);
       } else if (p.content.type.includes("video")) {
         const vid = document.createElement("video");
         vid.src = fileURL;
         vid.controls = true;
         vid.style.maxWidth = "100%";
-        container.appendChild(vid);
+        box.appendChild(vid);
       } else {
         const download = document.createElement("a");
         download.href = fileURL;
         download.download = "cached-file";
-        download.innerText = "Download File";
-        container.appendChild(download);
+        download.textContent = "⬇️ Download File";
+        box.appendChild(download);
       }
     }
 
-    container.appendChild(document.createElement("br"));
-    const delBtn = document.createElement("button");
-    delBtn.innerText = "🗑 Delete";
-    delBtn.onclick = async () => {
+    // 🗑 Delete button
+    const del = document.createElement("button");
+    del.innerText = "🗑 Delete";
+    del.onclick = async () => {
       await deletePage(p.url);
       viewCachedPages();
     };
-    container.appendChild(delBtn);
 
-    output.appendChild(container);
+    box.appendChild(document.createElement("br"));
+    box.appendChild(del);
+    output.appendChild(box);
   }
 }
 
-// Clear everything
+// 🧼 Clear all pages
 async function clearAllPages() {
   await clearAllStoredPages();
-  document.getElementById("output").innerText = "All cached data cleared.";
+  document.getElementById("output").innerText = "🧹 All cached pages cleared.";
 }
 
-// Register service worker
+// ⚙️ Service worker registration
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
