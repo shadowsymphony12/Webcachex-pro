@@ -10,7 +10,6 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// 🔄 Cache any URL with CORS support
 async function cacheURL() {
   const url = document.getElementById("urlInput").value.trim();
   const output = document.getElementById("output");
@@ -25,9 +24,9 @@ async function cacheURL() {
     const result = await fetchPageThroughProxy(url);
 
     if (typeof result === "string") {
-      await savePage(url, result); // HTML/text
+      await savePage(url, result);
     } else {
-      await savePage(url, { blob: result.blob, type: result.type }); // File
+      await savePage(url, { blob: result.blob, type: result.type });
     }
 
     output.innerText = "✅ Cached successfully!";
@@ -37,9 +36,8 @@ async function cacheURL() {
   }
 }
 
-// 🔗 Fetch page content through CORS proxy
 async function fetchPageThroughProxy(url) {
-  const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+  const proxy = "https://thingproxy.freeboard.io/fetch/" + encodeURIComponent(url);
   const response = await fetch(proxy);
 
   if (!response.ok) throw new Error("Failed to fetch through CORS proxy");
@@ -47,14 +45,13 @@ async function fetchPageThroughProxy(url) {
   const contentType = response.headers.get("Content-Type") || "";
 
   if (contentType.includes("text/html") || contentType.includes("text/plain")) {
-    return await response.text(); // HTML content
+    return await response.text();
   } else {
-    const blob = await response.blob(); // Binary content
+    const blob = await response.blob();
     return { blob, type: contentType };
   }
 }
 
-// 📂 View cached pages
 async function viewCachedPages() {
   const output = document.getElementById("output");
   const pages = await getAllPages();
@@ -109,7 +106,6 @@ async function viewCachedPages() {
       }
     }
 
-    // 🗑 Delete Button
     const del = document.createElement("button");
     del.innerText = "🗑 Delete";
     del.onclick = async () => {
@@ -123,13 +119,11 @@ async function viewCachedPages() {
   }
 }
 
-// 🧼 Clear all cached data
 async function clearAllPages() {
   await clearAllStoredPages();
   document.getElementById("output").innerText = "🧹 All cached data cleared.";
 }
 
-// ⚙️ Register service worker
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
