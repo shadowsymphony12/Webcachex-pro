@@ -6,27 +6,39 @@ async function cacheURL() {
   try {
     const response = await fetch(url);
     const content = await response.text();
-    localStorage.setItem(url, content);
-    output.innerText = "Cached successfully!";
+    await savePage(url, content);
+    output.innerText = "Page cached successfully!";
   } catch (err) {
-    output.innerText = "Error: Failed to fetch";
+    output.innerText = "Error fetching the page.";
     console.error(err);
   }
 }
 
-function viewCachedPages() {
+async function viewCachedPages() {
   const output = document.getElementById("output");
+  const pages = await getAllPages();
   output.innerHTML = "<h3>Cached Pages:</h3>";
 
-  if (localStorage.length === 0) {
-    output.innerHTML += "No pages cached.";
+  if (pages.length === 0) {
+    output.innerHTML += "<p>No cached pages found.</p>";
     return;
   }
 
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    output.innerHTML += <p><strong>${key}</strong><br/><textarea rows="8" cols="80">${localStorage.getItem(key)}</textarea></p>;
-  }
+  pages.forEach(p => {
+    output.innerHTML += `
+      <div style="margin-bottom: 20px;">
+        <strong>${p.url}</strong>
+        <textarea rows="10" cols="80">${p.content}</textarea>
+        <br/>
+        <button onclick="deletePage('${p.url}')">Delete</button>
+      </div>
+    `;
+  });
+}
+
+async function clearAllPages() {
+  await clearAllStoredPages();
+  document.getElementById("output").innerText = "All pages cleared.";
 }
 
 if ('serviceWorker' in navigator) {
