@@ -39,7 +39,7 @@ async function cacheURL() {
 
 // 🔗 Fetch page content through CORS proxy
 async function fetchPageThroughProxy(url) {
-  const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+  const proxy = "https://thingproxy.freeboard.io/fetch/" + encodeURIComponent(url);
   const response = await fetch(proxy);
 
   if (!response.ok) throw new Error("Failed to fetch through CORS proxy");
