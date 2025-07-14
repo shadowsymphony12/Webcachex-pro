@@ -6,17 +6,17 @@
   <title>WebCacheX Pro</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.png" type="image/png" />
 </head>
 <body>
   <h1>WebCacheX Pro</h1>
-  <p>Offline smart web caching and browsing app (PWA)</p>
-
-  <input type="text" id="urlInput" placeholder="Enter a URL (text or video)" />
+  <input type="text" id="urlInput" placeholder="Enter a URL" />
   <button onclick="cacheURL()">Cache Page</button>
   <button onclick="viewCachedPages()">View Cached</button>
-
+  <button onclick="clearAllPages()">Clear All</button>
   <div id="output"></div>
 
+  <script src="db.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
