@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WebCacheX Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.png" type="image/png" />
+</head>
+<body>
+  <h1>🌐 WebCacheX Pro</h1>
+
+  <input type="text" id="urlInput" placeholder="Enter URL to cache..." />
+  <button onclick="cacheURL()">⚡ Cache Page</button>
+  <button onclick="viewCachedPages()">📂 View Cached</button>
+  <button onclick="clearAllPages()">🧹 Clear All</button>
+  <button id="toggleTheme">🌓 Toggle Theme</button>
+
+  <div id="output"></div>
+
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
