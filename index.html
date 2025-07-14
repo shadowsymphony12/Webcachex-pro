@@ -9,12 +9,27 @@
   <link rel="icon" href="icon.png" type="image/png" />
 </head>
 <body>
-  <h1>WebCacheX Pro</h1>
-  <input type="text" id="urlInput" placeholder="Enter a URL" />
-  <button onclick="cacheURL()">Cache Page</button>
-  <button onclick="viewCachedPages()">View Cached</button>
-  <button onclick="clearAllPages()">Clear All</button>
+  <div class="header">
+    <h1>WebCacheX Pro</h1>
+    <button id="toggleTheme">🌓 Toggle Theme</button>
+  </div>
+
+  <div class="input-section">
+    <input type="text" id="urlInput" placeholder="Enter a URL to cache (YouTube, Wikipedia, PDF...)" />
+    <button onclick="cacheURL()">Cache Page</button>
+    <button onclick="viewCachedPages()">View Cached</button>
+    <button onclick="clearAllPages()">Clear All</button>
+  </div>
+
   <div id="output"></div>
+
+  <div class="video-section">
+    <h3>📹 How to Use WebCacheX Pro</h3>
+    <video width="100%" height="auto" controls>
+      <source src="tutorial.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
 
   <script src="db.js"></script>
   <script src="app.js"></script>
