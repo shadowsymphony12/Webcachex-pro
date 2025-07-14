@@ -7,13 +7,11 @@ let db;
 function openDB() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
-
     request.onerror = () => reject("Failed to open DB");
     request.onsuccess = () => {
       db = request.result;
       resolve(db);
     };
-
     request.onupgradeneeded = (event) => {
       db = event.target.result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
