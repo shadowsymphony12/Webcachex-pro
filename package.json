@@ -1,0 +1,15 @@
+{
+  "name": "webcachex-bot",
+  "version": "1.0.0",
+  "description": "Generate & deploy offline-first sites",
+  "main": "bot.js",
+  "scripts": {
+    "build": "pkg . --targets node16-win-x64 --output WebCacheX-Bot.exe"
+  },
+  "bin": "bot.js",
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "node-fetch": "^2.6.7",
+    "simple-git": "^3.23.0"
+  }
+}
