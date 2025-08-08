@@ -1,46 +1,26 @@
-const dbName = "WebCacheXDB";
-const storeName = "pages";
+let db;
+const request = indexedDB.open('WebCacheXDB', 1);
 
-function getDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(dbName, 1);
-    request.onerror = () => reject("Failed to open DB");
-    request.onsuccess = () => resolve(request.result);
-    request.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      db.createObjectStore(storeName, { keyPath: "url" });
-    };
+request.onsuccess = () => (db = request.result);
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  db.createObjectStore('cache', { keyPath: 'id' });
+};
+
+async function saveToDB(entry) {
+  return new Promise(resolve => {
+    const tx = db.transaction('cache', 'readwrite');
+    const store = tx.objectStore('cache');
+    store.put(entry);
+    tx.oncomplete = resolve;
   });
 }
 
-async function savePage(url, content) {
-  const db = await getDB();
-  const tx = db.transaction(storeName, "readwrite");
-  tx.objectStore(storeName).put({ url, content });
-  return tx.complete;
-}
-
-async function getAllPages() {
-  const db = await getDB();
-  const tx = db.transaction(storeName, "readonly");
-  const store = tx.objectStore(storeName);
-  return new Promise((resolve, reject) => {
-    const request = store.getAll();
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject("Failed to fetch pages");
+async function getAllFromDB() {
+  return new Promise(resolve => {
+    const tx = db.transaction('cache', 'readonly');
+    const store = tx.objectStore('cache');
+    const req = store.getAll();
+    req.onsuccess = () => resolve(req.result || []);
   });
-}
-
-async function deletePage(url) {
-  const db = await getDB();
-  const tx = db.transaction(storeName, "readwrite");
-  tx.objectStore(storeName).delete(url);
-  return tx.complete;
-}
-
-async function clearAllStoredPages() {
-  const db = await getDB();
-  const tx = db.transaction(storeName, "readwrite");
-  tx.objectStore(storeName).clear();
-  return tx.complete;
 }
